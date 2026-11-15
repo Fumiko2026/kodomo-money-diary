@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:17
+    container_name: kodomo-money-db
+    environment:
+      POSTGRES_USER: kodomo
+      POSTGRES_PASSWORD: kodomo_dev_password
+      POSTGRES_DB: kodomo_money
+      TZ: Asia/Tokyo
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kodomo -d kodomo_money"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  db-data:

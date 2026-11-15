@@ -1,0 +1,21 @@
+# 依存ライブラリ・ビルドの結果(コマンドで作りなおせるもの)
+node_modules/
+dist/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# 秘密の値(パスワード、鍵)。リポジトリには入れない
+.env
+.env.*
+!.env.example
+*.tfvars
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# エディタ・OS
+.DS_Store
+.vscode/
+.idea/
