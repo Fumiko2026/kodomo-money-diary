@@ -1,5 +1,7 @@
 # こどもマネー日記
 
+[![CI](https://github.com/Fumiko2026/kodomo-money-diary/actions/workflows/ci.yml/badge.svg)](https://github.com/Fumiko2026/kodomo-money-diary/actions/workflows/ci.yml)
+
 小中学生が、お小遣いの「もらった」「つかった」を記録して、ほしいもののために貯金を計画できる Web アプリです。
 
 - さいふと貯金を分けて表示します(貯金すると、さいふから貯金へお金が移ります)。
@@ -58,7 +60,7 @@ cd frontend && npm test                              # 115 件
 - [x] 要件定義、画面の案、ER 図、API 設計
 - [x] バックエンド(認証、記録、しゅるい、月のまとめ、ほしいもの)
 - [x] フロントエンド(全 9 画面)
-- [ ] GitHub Actions(自動テスト)
+- [x] GitHub Actions(自動テスト。push のたびに、バックエンドとフロントのテストを実行)
 - [ ] Terraform で AWS に公開
 
 > 開発用の DB パスワードと署名の鍵は、仮の値です(`docker-compose.yml`、`backend/app/config.py`)。

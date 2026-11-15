@@ -1,0 +1,85 @@
+name: CI
+
+# main へ push したときと、プルリクエストのときに、テストを自動で動かす
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# 同じブランチで、続けて push したら、古い実行は止める
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: バックエンド(pytest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    # テスト用の PostgreSQL(開発の docker-compose.yml と同じ版)
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: kodomo
+          POSTGRES_PASSWORD: kodomo_ci_password
+          POSTGRES_DB: kodomo_money
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U kodomo -d kodomo_money"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql+psycopg://kodomo:kodomo_ci_password@localhost:5432/kodomo_money
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.15'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - run: pip install -r requirements.txt
+
+      # テーブルを作る(マイグレーションが、まっさらな DB で動くことも確かめられる)
+      - run: alembic upgrade head
+
+      - run: pytest -q
+
+  frontend:
+    name: フロントエンド(型チェック・ビルド・Vitest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+
+      # vue-tsc での型チェック + vite build
+      - run: npm run build
+
+      - run: npm test
