@@ -15,7 +15,7 @@
 | フロントエンド | Vue 3 + TypeScript(Vite)、Vitest |
 | バックエンド | Python + FastAPI、SQLAlchemy + Alembic、pytest |
 | DB | PostgreSQL 17(開発中は Docker) |
-| 公開(予定) | Terraform で AWS の EC2 + RDS |
+| 公開 | Terraform で AWS(東京)の EC2 1 台。Docker で nginx + FastAPI + PostgreSQL |
 
 ## 動かしかた(開発)
 
@@ -90,7 +90,7 @@ cd infra && terraform destroy
 - [x] バックエンド(認証、記録、しゅるい、月のまとめ、ほしいもの)
 - [x] フロントエンド(全 9 画面)
 - [x] GitHub Actions(自動テスト。push のたびに、バックエンドとフロントのテストを実行)
-- [ ] Terraform で AWS に公開(コードは作成ずみ。`terraform apply` はこれから)
+- [x] Terraform で AWS(東京)に公開。EC2 1 台で動作を確認(確認が済んだら `terraform destroy` で消す)
 
 > 開発用の DB パスワードと署名の鍵は、仮の値です(`docker-compose.yml`、`backend/app/config.py`)。
 > 公開するときは、環境変数で必ず別の値に変えます。

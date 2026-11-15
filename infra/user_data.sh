@@ -36,5 +36,14 @@ echo "${COMPOSE_SHA256}  ${PLUGIN_DIR}/docker-compose" | sha256sum -c -
 chmod +x "$PLUGIN_DIR/docker-compose"
 docker compose version
 
+# Docker buildx。Compose がイメージをビルドするときに必要(Amazon Linux の Docker には入っていない)
+BUILDX_VERSION="v0.39.0"
+BUILDX_SHA256="722cdcdfdd6f3fb943fa1ba75102d057feb18ba72aab93b1b0a8cf2b2b48a25f"
+retry curl -fsSL -o "$PLUGIN_DIR/docker-buildx" \
+  "https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-arm64"
+echo "${BUILDX_SHA256}  ${PLUGIN_DIR}/docker-buildx" | sha256sum -c -
+chmod +x "$PLUGIN_DIR/docker-buildx"
+docker buildx version
+
 mkdir -p /opt/kodomo
 touch /opt/kodomo/.bootstrap-done
