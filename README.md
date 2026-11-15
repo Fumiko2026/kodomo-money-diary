@@ -46,6 +46,35 @@ cd backend  && source .venv/bin/activate && pytest   # 81 件(DB が起動して
 cd frontend && npm test                              # 115 件
 ```
 
+## AWS に公開する(東京リージョン)
+
+EC2(`t4g.micro`)1 台の中で、画面(nginx)・API(FastAPI)・PostgreSQL を Docker で動かします。
+RDS と NAT ゲートウェイは使いません(費用を抑えるため。動かしている間は、1 日 $0.4 ほど)。
+EC2 へのログインは SSH ではなく SSM を使い、外に開けるのは 80 番(HTTP)だけです。
+
+```bash
+aws login --profile kokuban          # AWS にログイン(期限が切れたら、もう一度)
+
+cd infra
+terraform init
+terraform plan                       # 何が作られるかを確認(費用はかかりません)
+terraform apply                      # 実際に作る(ここから費用がかかります)
+cd ..
+
+scripts/deploy.sh                    # アプリを届けて起動。終わると URL が出ます
+```
+
+アプリを直したあとも、`scripts/deploy.sh` をもう一度実行すれば、入れかわります(DB のデータは残ります)。
+
+**使い終わったら、必ず消します**(消さないと、費用がかかりつづけます)。
+
+```bash
+cd infra && terraform destroy
+```
+
+> HTTPS ではないので、公開中は、本物のパスワードを使わないでください。
+> 秘密の値(DB のパスワード、署名の鍵)は、Terraform が作って AWS の SSM パラメータに入れます。このリポジトリには入りません。
+
 ## 文書
 
 | ファイル | 内容 |
@@ -61,7 +90,7 @@ cd frontend && npm test                              # 115 件
 - [x] バックエンド(認証、記録、しゅるい、月のまとめ、ほしいもの)
 - [x] フロントエンド(全 9 画面)
 - [x] GitHub Actions(自動テスト。push のたびに、バックエンドとフロントのテストを実行)
-- [ ] Terraform で AWS に公開
+- [ ] Terraform で AWS に公開(コードは作成ずみ。`terraform apply` はこれから)
 
 > 開発用の DB パスワードと署名の鍵は、仮の値です(`docker-compose.yml`、`backend/app/config.py`)。
 > 公開するときは、環境変数で必ず別の値に変えます。

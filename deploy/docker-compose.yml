@@ -1,0 +1,48 @@
+# 本番(EC2)で動かす構成。開発用の docker-compose.yml(DB だけ)とは別のもの。
+# 置き場所は /opt/kodomo/app/deploy/。../backend と ../frontend-dist は、package.sh が作る。
+name: kodomo-money
+
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kodomo
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD が必要です}
+      POSTGRES_DB: kodomo_money
+      TZ: Asia/Tokyo
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kodomo -d kodomo_money"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    # ports は公開しない: 外からは、DB につながらない(api からだけ)
+
+  api:
+    build: ../backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://kodomo:${DB_PASSWORD}@db:5432/kodomo_money
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY が必要です}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false} # HTTPS にしたら true
+    depends_on:
+      db:
+        condition: service_healthy
+    # 起動のたびに、テーブルを最新にしてから、APIを始める
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  web:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-80}:80"
+    volumes:
+      - ../frontend-dist:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api
+
+volumes:
+  db-data:
