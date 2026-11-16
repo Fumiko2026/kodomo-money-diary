@@ -8,14 +8,29 @@
 - 月ごとのまとめ、ほしいもの(3 つまで)の進み具合が見られます。
 - 画面の言葉は、小学 4 年生までの漢字に合わせています。
 
-## 技術
+## 使用技術とバージョン
 
-| 区分 | 使うもの |
-|---|---|
-| フロントエンド | Vue 3 + TypeScript(Vite)、Vitest |
-| バックエンド | Python + FastAPI、SQLAlchemy + Alembic、pytest |
-| DB | PostgreSQL 17(開発中は Docker) |
-| 公開 | Terraform で AWS(東京)の EC2 1 台。Docker で nginx + FastAPI + PostgreSQL |
+| 区分 | 技術 | バージョン |
+|---|---|---|
+| フロントエンド | Vue | 3.5 |
+| | TypeScript | 6.0 |
+| | Vite(ビルド) | 8.3 |
+| | Vue Router | 5.5 |
+| | Vitest + Vue Test Utils(テスト) | 5.1 / 2.6 |
+| バックエンド | Python | 3.15 |
+| | FastAPI | 0.163 |
+| | SQLAlchemy(ORM)/ Alembic(マイグレーション) | 2.1 / 1.20 |
+| | Pydantic(入力のチェック) | 2.14 |
+| | Argon2(パスワードのハッシュ化) | argon2-cffi 25.1 |
+| | pytest(テスト) | 9.2 |
+| データベース | PostgreSQL | 17 |
+| インフラ | Docker / Docker Compose | 29 / 5.7 |
+| | nginx | 1.27 |
+| | Terraform(AWS provider) | 1.17(~> 6.0) |
+| | AWS(東京) | EC2 `t4g.micro`、Amazon Linux 2023、S3、SSM |
+| CI | GitHub Actions | バックエンド・フロントのテストを自動実行 |
+
+テストは、バックエンド 81 件、フロントエンド 115 件です。
 
 ## 動かしかた(開発)
 
